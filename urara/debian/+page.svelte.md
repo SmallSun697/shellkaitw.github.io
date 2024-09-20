@@ -643,7 +643,7 @@ link = 建立檔案軟連結 (需有 src、dest)
 ```|```：當有多行文字需要輸入到文件時可以使用
 刪除內容：
 ![image](https://hackmd.io/_uploads/BJWZakTDC.png)
-<font color=green># 匹配 /etc/bind/db.wsc2024 的內容，內容為 "IN  A 192.168.1.1"，若偵測到就會將該行刪除</font>
+匹配 /etc/bind/db.wsc2024 的內容，內容為 "IN  A 192.168.1.1"，若偵測到就會將該行刪除
 刪除文件需要將 ```state``` 設為 ```absent``` (預設為 ```present```) 並搭配 ```regexp``` (正規表示匹配) (或 ```regex ```) 使用，`^` 表示行的開頭，`$` 表示行的結尾
 若只用 `^` 代表只取開頭，只用 `$` 代表只取結尾
 **注意：只要匹配到就會整行刪除！**
@@ -672,7 +672,7 @@ link = 建立檔案軟連結 (需有 src、dest)
 預設的 ```marker``` 就算為空還是會有預設的空格，可以透過 lineinfile 匹配刪除空格
 ### replace (全局替換)
 ![image](https://hackmd.io/_uploads/BkdFrzpwR.png)
-<font color=green># 將全部匹配到 Listen 的內容全部替換為 I dont want to listen</font>
+將全部匹配到 Listen 的內容全部替換為 I dont want to listen
 ```replace```：後面接要替換上去的內容
 原檔案：
 ![image](https://hackmd.io/_uploads/Hk-NR-awR.png)
@@ -704,7 +704,7 @@ link = 建立檔案軟連結 (需有 src、dest)
 
 判斷結果是否執行動作：
 ![image](https://hackmd.io/_uploads/BJJiJH2DC.png)
-<font color=green># 若 /etc/bind/db.wsc2024 的檔案不存在，則執行上面的動作</font>
+若 /etc/bind/db.wsc2024 的檔案不存在，則執行上面的動作
 ```when```：根據暫存器回傳結果決定是否要執行
 ```
 stat 變數：
@@ -731,7 +731,7 @@ not exist.stat.isdir = 當 exist 暫存器內路徑為檔案或不存在時執�
 ![image](https://hackmd.io/_uploads/BkP1mCQ_R.png)
 ### debug + msg (print out) (輸出文字)
 ![image](https://hackmd.io/_uploads/SkEpPH2vC.png)
-<font color=green># 用 shell 指令 echo hostname 並輸出</font>
+用 shell 指令 echo hostname 並輸出
 ```stdout```：標準輸出，一般暫存器無特殊後綴都會需要
 ![image](https://hackmd.io/_uploads/ByqmkU2PA.png)
 若無加 ```stdout```：
