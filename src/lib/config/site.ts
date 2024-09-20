@@ -1,17 +1,28 @@
 import type { SiteConfig } from '$lib/types/site'
 
 export const site: SiteConfig = {
-  author: {
-    avatar: '/assets/maskable@512.png',
-    bio: 'lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    name: 'John Doe',
-    status: '🌸',
-  },
-  description: 'Powered by SvelteKit/Urara',
-  domain: import.meta.env.URARA_SITE_DOMAIN ?? 'urara-demo.netlify.app',
-  lang: 'en-US',
   protocol: import.meta.env.URARA_SITE_PROTOCOL ?? import.meta.env.DEV ? 'http://' : 'https://',
-  subtitle: 'Sweet & Powerful SvelteKit Blog Template',
-  themeColor: '#3D4451',
-  title: 'Urara',
+  domain: import.meta.env.URARA_SITE_DOMAIN ?? 'localhost:5173',
+  title: "Shellkai's Blog",
+  subtitle: 'Learning from experience.',
+  lang: 'zh-TW',
+  description: 'Copyright © ShellkaiTW 2024 - All right reserved\tPowered by SvelteKit/Urara',
+  author: {
+    avatar: '/assets/profile.jpg',
+    name: 'Shellkai Huang',
+    status: '🦾',
+    bio: '喜歡玩點伺服器，搞點刷機 & Root #Skills39',
+    // pnpm install @iconify-json/simple-icons
+    metadata: [
+      {
+        icon: 'i-simple-icons-github',
+        link: 'https://github.com/ShellkaiTW'
+      },
+      {
+        icon: 'i-simple-icons-instagram',
+        link: 'https://instagram.com/shellkai__2006'
+      }
+    ]
+  },
+  themeColor: '#3D4451'
 }

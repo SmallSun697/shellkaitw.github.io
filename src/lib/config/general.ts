@@ -1,54 +1,54 @@
-import type { DateConfig, FeedConfig, FooterConfig, HeadConfig, HeaderConfig, ThemeConfig } from '$lib/types/general'
+import type { ThemeConfig, HeadConfig, HeaderConfig, FooterConfig, DateConfig, FeedConfig } from '$lib/types/general'
 
 export const theme: ThemeConfig = [
   {
     name: 'cmyk',
-    text: '🖨 Light',
+    text: '🖨 Light'
   },
   {
     name: 'dracula',
-    text: '🧛 Dark',
+    text: '🧛 Dark'
   },
   {
     name: 'valentine',
-    text: '🌸 Valentine',
+    text: '🌸 Valentine'
   },
   {
     name: 'aqua',
-    text: '💦 Aqua',
+    text: '💦 Aqua'
   },
   {
     name: 'synthwave',
-    text: '🌃 Synthwave',
+    text: '🌃 Synthwave'
   },
   {
     name: 'night',
-    text: '🌃 Night',
+    text: '🌃 Night'
   },
   {
     name: 'lofi',
-    text: '🎶 Lo-Fi',
+    text: '🎶 Lo-Fi'
   },
   {
     name: 'lemonade',
-    text: '🍋 Lemonade',
+    text: '🍋 Lemonade'
   },
   {
     name: 'cupcake',
-    text: '🧁 Cupcake',
+    text: '🧁 Cupcake'
   },
   {
     name: 'garden',
-    text: '🏡 Garden',
+    text: '🏡 Garden'
   },
   {
     name: 'retro',
-    text: '🌇 Retro',
+    text: '🌇 Retro'
   },
   {
     name: 'black',
-    text: '🖤 Black',
-  },
+    text: '🖤 Black'
+  }
 ]
 
 export const head: HeadConfig = {}
@@ -56,37 +56,41 @@ export const head: HeadConfig = {}
 export const header: HeaderConfig = {
   nav: [
     {
-      link: '/hello-world',
-      text: 'Get Started',
+      text: 'Home',
+      link: '/'
     },
     {
-      link: '/hello-world/elements',
-      text: 'Elements',
-    },
-  ],
+      text: 'About',
+      link: '/hello-world/about_me'
+    }
+  ]
 }
 
 export const footer: FooterConfig = {
   nav: [
     {
-      link: '/atom.xml',
       text: 'Feed',
+      link: '/atom.xml'
     },
     {
-      link: '/sitemap.xml',
       text: 'Sitemap',
+      link: '/sitemap.xml'
     },
-  ],
+    {
+      text: 'kkai1009@gmail.com',
+      link: 'mailto:kkai1009@gmail.com'
+    }
+  ]
 }
 
 export const date: DateConfig = {
-  locales: 'en-US',
+  locales: 'zh-TW',
   options: {
-    day: 'numeric',
-    month: 'short',
-    weekday: 'long',
     year: '2-digit',
-  },
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric'
+  }
 }
 
 export const feed: FeedConfig = {}
