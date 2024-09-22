@@ -2,8 +2,8 @@
 title: 'Debian'
 image: '/debian.jpg'
 alt: 'Shellkai Huang'
-created: 2024-09-16
-updated: 2024-09-16
+created: 2022-12-16
+updated: 2024-09-22
 tags:
  - Linux
  - OS

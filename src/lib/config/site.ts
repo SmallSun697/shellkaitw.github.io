@@ -2,7 +2,7 @@ import type { SiteConfig } from '$lib/types/site'
 
 export const site: SiteConfig = {
   protocol: import.meta.env.URARA_SITE_PROTOCOL ?? import.meta.env.DEV ? 'http://' : 'https://',
-  domain: import.meta.env.URARA_SITE_DOMAIN ?? 'localhost:5173',
+  domain: import.meta.env.URARA_SITE_DOMAIN ?? 'shellkaitw.github.io',
   title: "Shellkai's Blog",
   subtitle: 'Learning from experience.',
   lang: 'zh-TW',

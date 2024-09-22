@@ -3,8 +3,8 @@ title: 'Web'
 summary: 'Self-Signed Certificate + OpenSSL + ADCS + Nginx & Apache2'
 image: '/badssl.png'
 alt: 'Shellkai Huang'
-created: 2024-09-16
-updated: 2024-09-16
+created: 2023-03-14
+updated: 2024-09-22
 tags:
  - Web
  - SSL

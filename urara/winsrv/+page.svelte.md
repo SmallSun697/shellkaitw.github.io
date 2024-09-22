@@ -1,16 +1,15 @@
 ---
 title: 'Windows Server'
+summary: 'Hardening write up'
 image: '/winsrv.jpg'
 alt: 'Shellkai Huang'
-created: 2024-09-16
-updated: 2024-09-16
+created: 2023-02-06
+updated: 2024-09-22
 tags:
  - Windows
  - OS
 ---
-## GPO 相關設定
-### 初次登錄動畫關閉
-打開 GPO，找到「**Administrative Templates\System\Logon**」中的「**Show first sign-in animation**」，設定為 **Disable**，再執行 ```gpupdate /force```來立即套用更新
+## GPO 相關安全強化
 ### 禁止存取控制台設定
 GPO -> User Configuration -> Policies -> Administrative Templetes -> Control Panel -> 設定 Prohibit access to Control Panel and PC settings 為 **Enabled**
 ![image](https://hackmd.io/_uploads/HJi2R6hqh.png)
@@ -22,77 +21,18 @@ GPO -> User Configuration -> Administrative Templetes -> System -> 設定 Don't 
 ### 設定在 Logon UI 看不到上個登入的使用者
 GPO -> Computer Configuration -> Policies -> Administrative Templetes -> System -> Logon -> 設定 Block user from showing account details on sign-in 為 **Enabled**
 ![](https://hackmd.io/_uploads/rkMTCT2q2.png)
-### 登入時自動掛載共享資料夾
-Step 1. 製作 Bash Script
-```bash==
-// 掛載 \\windc.nsc49.skills.tw\web 網路位置到電腦，且磁碟代號為 W:
-net use W: /delete
-net use W: \\windc.nsc49.skills.tw\web
-```
-Step 2. 用 GPO 設定讓此指令在登入時自動執行
-新增 GPO -> User Configuration -> Policies -> Windows Settings -> Script (Logon/Logoff) -> Logon -> Add -> Browse -> 將 Script 丟至彈出的資料夾 -> 選擇後點選 OK
-![](https://hackmd.io/_uploads/rkd1JRhq2.png)
-![image](https://hackmd.io/_uploads/ryScekxjp.png)
-註：最好放在下面「Show Files...」的資料夾內，否則有機率腳本會無法生效
-### 若共享資料夾有跨網域
-只需讓 Script 使用網域管理員身分登入即可：
-```bash==
-// 掛載 \\windc.nsc49.skills.tw\web 網路位置到電腦，且磁碟代號為 W:，使用 AD/Administrator 身分來登入
-net use W: /delete
-net use W: \\windc.nsc49.skills.tw\web /user:AD\Administrator Skills39 /p:yes
-```
 ### 讓 Windows Server 也能掛載 Debian SMBD
 Local GPO -> Computer Configuration -> Administrative Templates -> Network -> Lanman Workstation -> 設定 Enable insecure guest logons 為 **Enabled**
 ![](https://hackmd.io/_uploads/rynWy0n92.png)
 ### GPO 個別使用者套用規則
 若要指定特別使用者套用 Group Policy (刪除 Authentication Users)，至少要保留一台 Computer (最好是 Server 和 Client 都保留)
 ![image](https://hackmd.io/_uploads/SJMjm3FRT.png)
-### 開機時自動跳出訊息
-GPO -> Computer Configuration -> Windows Settings -> Security Settings -> Local Policy -> Security Options
-![image](https://hackmd.io/_uploads/r15ckli0T.png)
-![image](https://hackmd.io/_uploads/SyCi61j0T.png)
-![image](https://hackmd.io/_uploads/H1zjyeiRa.png)
-當電腦準備登入時會顯示：
-![image](https://hackmd.io/_uploads/S1MRyejRp.png)
 ### 禁止使用 Windows Update
 GPO -> Computer Configuration -> Administrative Templates -> Windows Components -> Windows Update -> 設定 Remove access to use all Windows Update features 為 **Enabled**
 ![image](https://hackmd.io/_uploads/BJ7flZjC6.png)
 效果：
 ![image](https://hackmd.io/_uploads/SJl3gGbsR6.png)
-### 登入時自動將檔案複製到桌面
-```bash==
-// 將 PuTTY 複製到使用者的桌面上
-copy C:\putty.exe %USERPROFILE%\Desktop
-// %USERPROFILE% 指的是當前登入使用者的 User 目錄
-```
-寫好後將檔案另存為 cmd，可參照上面的步驟套用於 GPO
-### 用指令載入登錄檔
-將登錄機碼匯出為 ```.reg``` 格式的檔案：右鍵 -> Export -> 選擇路徑
-![image](https://hackmd.io/_uploads/H1HquOl1C.png)
-```bash==
-reg import [reg_file].reg
-```
-另存為 cmd，一樣可以套用於 GPO
 ## DNS
-### DNS 快取紀錄關閉
-按一下 Windows Key + R，輸入 regedit 後 Enter
-設定「**HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Dnscache**」中的 **Start** 值為 4，重啟後即可關閉 DNS 快取紀錄
-
-### DNS 同步
-```
-DC：192.168.39.10 (Primary DNS)
-SRV：192.168.39.20 (Secondary DNS)
-```
-先允許 Primary DNS 跟 Secondary DNS 的 Zone Transfer 功能
-DC：
-![image](https://hackmd.io/_uploads/r1KPerlC6.png)
-SRV：
-![image](https://hackmd.io/_uploads/SyOQWHgRp.png)
-選擇域名按右鍵 -> Transfer new copy of zone from Master
-![image](https://hackmd.io/_uploads/r1rqWSgRp.png)
-即可完成同步
-
-若要設定自動同步項可以看下方的 SOA
 #### 通知 (Notify)
 在 Primary DNS 上設定當記錄發生變化時通知 Secondary DNS
 ![image](https://hackmd.io/_uploads/SJ3xUBlAT.png)
@@ -104,79 +44,6 @@ Refresh interval：Secondary DNS 多久向 Primary DNS 伺服器同步
 Retry interval：當 Secondary DNS 向 Primary DNS 同步但無法連線到 Primary DNS，多久後重試
 Expires after：當 Secondary DNS 無法連線到 Primary DNS 會一直重試，如果重試超過到期時間就放棄重試
 Minimum TTL：當其它 DNS 伺服器查詢這個網域的記錄時，資料儲存在對方伺服器快取中的時間 (若在到期前若對方伺服器又收到相同查詢就會直接回應快取中的資料)
-### Conditional Forwarders
-與 Forward 功能相似，但是可以指定網域傳送到指定伺服器
-![image](https://hackmd.io/_uploads/S13rUWy_A.png)
-![image](https://hackmd.io/_uploads/rJTtLWJu0.png)
-DNS Domain：當收到這個網域的 DNS Request 時送到指定的 DNS Servers
-IP addresses of the master servers：指定網域的 DNS Servers
-```
-本地 DNS：wsc2024.tw / 172.16.20.10
-遠端 DNS：worldskills.org / 8.8.8.8
-```
-![image](https://hackmd.io/_uploads/ByeFwZkO0.png)
-![image](https://hackmd.io/_uploads/B1uqDZkuA.png)
-## 使用者設定 (cmd & for loop)
-```bash==
-//加入九個使用者，名稱為 IT01~IT09
-for /l %a in (1 1 9) do net user IT0%a /add
-//加入九個使用者，名稱為 HQ01~HQ09，密碼為 Skills39
-for /l %a in (1 1 9) do net user HQ0%a Skills39 /add
-//刪除使用者
-net user [username] /del
-```
-## 進階使用者設定 (PowerShell & for loop)
-### Set-ADUser
-通常是使用者的細項資料設定才會用到
-```bash==
-//將 FA001~009 九個使用者的 Display Name 設定為 Flight Attendant 001~009
-1..9 | % { Set-ADUser -Identity FA00$_ -DisplayName "Flight Attendant 00$_" }
-// "$_" 是一個特殊的 PowerShell 自動變數，代表執行中的腳本或指令所傳遞過來的變數
-```
-![image](https://hackmd.io/_uploads/By0zKd-NA.png)
-
-若忘記指令也可透過 PowerShell IDE 尋找指令
-![image](https://hackmd.io/_uploads/HyFtKuZEA.png)
-### dsmod
-dsmod 與 Set-ADUser 的功能相同
-先使用 `dsquery` 指令列出所有的完整使用者名稱 (包含所屬網域等參數)，在使用 `dsmod` 指令時需要
-```bash==
-dsquery user
-// 列出所有使用者完整名稱
-```
-![image](https://hackmd.io/_uploads/ryT_7DHO0.png)
-
-```bash==
-dsmod user /?
-// 可查看所有 dsmod 可修改的參數及表示方式
-```
-```bash==
-dsmod user [full_user_name] -office "IT Manager"
-// 將使用者的 Office 參數改為 IT Manager
-```
-![image](https://hackmd.io/_uploads/Sy5WNDrO0.png)
-![image](https://hackmd.io/_uploads/BkozEwHOA.png)
-
-## 群組設定 (cmd & for loop)
-通常僅會在 Windows Server 題目中沒有要求做 Active Directory 時才會用到
-```bash==
-//新增群組
-net localgroup [groupname] /add
-//將 IT01~09 共九人加入 IT 群組
-for /l %a in (1 1 9) do net localgroup IT IT0%a /add
-//將使用者移出群組
-net localgroup [groupname] [username] /del
-//重新命名群組
-wmic group where name="[oldname]" rename [newname]
-//檢查群組內的使用者
-net localgroup [groupname]
-```
-PS：若群組名稱或使用者名稱有空格，需要用雙引號("")括起來
-### 一次允許多個可使用遠端桌面的使用者
-```bash==
-//將 IT01~09 共九人允許使用遠端桌面連線
-for /l %a in (1 1 9) do net localgroup "Remote Desktop Users" IT0%a /add
-```
 ## 允許 ICMP 協議
 進入 Control Panel -> Windows Defender Firewall -> Advenced settings
 ![](https://hackmd.io/_uploads/r1s-A6n5n.png)
@@ -209,7 +76,7 @@ for /l %a in (1 1 9) do net localgroup "Remote Desktop Users" IT0%a /add
 ![](https://hackmd.io/_uploads/r1b2R6hq3.png)
 輸入 ```gpupdate /force``` 後，即完成設定
 ![](https://hackmd.io/_uploads/Hkh16KO2h.png)
-## 共享資料夾管理 (File Server Resource Manager)
+## 共享資料夾安全設定 (File Server Resource Manager)
 安裝 File Server Resource Manager
 ![image](https://hackmd.io/_uploads/HJn7SZjnp.png)
 ### 限制共享資料夾空間
@@ -243,25 +110,10 @@ for /l %a in (1 1 9) do net localgroup "Remote Desktop Users" IT0%a /add
 ![image](https://hackmd.io/_uploads/SklXxzj36.png)
 選好要套用的共享資料夾，並將選項選到剛剛設定的範本
 ![image](https://hackmd.io/_uploads/SJGceMoha.png)
-## 快速啟動網路介面控制
-按一下 Windows Key + R，輸入 ncpa.cpl 後 Enter
-![](https://hackmd.io/_uploads/HkXDvaLL2.png)
-可直接打開控制台網路介面
-![](https://hackmd.io/_uploads/Hkd38pU8n.png)
 ## 更改 Remote Desktop 的 TCP Port (登錄檔修改)
 按一下 Windows Key + R，輸入 regedit 後 Enter
 在「**HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp**」下，找到「**PortNumber**」選項並編輯其機碼值為欲設定的 Port 後重啟即可
 ![](https://hackmd.io/_uploads/HJckBqzF3.png)
-## DHCP Server 位址保留
-打開 DHCP -> 選擇要設定的 Scope -> Reservations -> New Reservation
-![](https://hackmd.io/_uploads/S1EOa9qtn.png)
-Reservation name (此保留設定的名稱)
-IP address (欲保留的 IP 位址)
-MAC address (保留的 IP 要給誰)
-Description (描述此保留設定，可略過)
-![](https://hackmd.io/_uploads/H1BNR9qtn.png)
-設定好後，到被保留 IP 的電腦上執行 ```ipconfig /renew``` (電腦網卡須設定為 DHCP)
-![](https://hackmd.io/_uploads/B1yiJi9Y3.png)
 ## VPN 設定
 新增 VPN 規則，選擇 DirectAccess and VPN (RAS)
 ![](https://hackmd.io/_uploads/BkaBU3Ps3.png)
@@ -299,7 +151,7 @@ Description (描述此保留設定，可略過)
 Constraints -> Authentication Methods -> Add... -> 選 Microsoft: Secured password (EAP-MSCHAP v2) -> OK
 ![](https://hackmd.io/_uploads/SJxzrwx16.png)
 ![](https://hackmd.io/_uploads/SJ-HIvlyT.png)
-### SSTP 設定
+### VPN 安全強化 (SSTP) 設定
 #### 有 Web Server + HTTPS
 如果有 Web Server，SSTP 所使用的憑證需要和 Web Server 一樣
 故要簽一張萬用域名(*)的憑證 (若 Web Server 和 SSTP 的 FQDN 不一樣的話)
@@ -374,73 +226,6 @@ Trusted Root Certificates Authorities -> Certificates -> 選擇要讓外部電�
 ![](https://hackmd.io/_uploads/B1Bq2XLRh.png)
 最後按下 Finish，即安裝完成根憑證，瀏覽內部網站時不會再跳出憑證錯誤等訊息
 ![](https://hackmd.io/_uploads/Skbb6Q8C2.png)
-## Windows 11
-### 安裝跳過 TPM、CPU 和 Secure Boot 檢查
-![](https://hackmd.io/_uploads/HkhM2Fdh3.png)
-進入安裝介面後，按「Shift + F10」叫出 cmd，並輸入 regedit
-![](https://hackmd.io/_uploads/HJmEkuJn3.png)
-找到「**Computer\HKEY_LOCAL_MACHINE\SYSTEM\Setup**」
-![](https://hackmd.io/_uploads/H1pi0Dknh.png)
-新增一個「LabConfig」機碼
-![](https://hackmd.io/_uploads/S1pkxdknn.png)
-在機碼內部新增三個 DWORD (32-bit) 值，分別為「**BypassTPMCheck**」、「**BypassSecureBootCheck**」、「**BypassCPUCheck**」及「**BypassRAMCheck**」，並將值全部設定為 1
-![](https://hackmd.io/_uploads/H1wN_tOhn.png)
-![](https://hackmd.io/_uploads/HkbSOFd32.png)
-![](https://hackmd.io/_uploads/SyLSOt_h2.png)
-![](https://hackmd.io/_uploads/rJgjotu2n.png)
-最後回上一步再進入安裝介面，即成功進入安裝介面
-![](https://hackmd.io/_uploads/BJ813FOn2.png)
-## Organizational Unit (OU)
-### 新增
-到 Active Directory Users and Computers -> New -> Organizational Unit
-![image](https://hackmd.io/_uploads/SkxfW-zTp.png)
-### 刪除
-直接將 OU 刪除的話，會遇到這個錯誤：
-![image](https://hackmd.io/_uploads/ryr1XZf6p.png)
-若要刪除 OU 需先設定：
-Step 1. 將目標網域右鍵 -> View -> 點選 Advanced Features
-![image](https://hackmd.io/_uploads/BkzAzbM6a.png)
-Step 2. 到想要刪除的 OU 右鍵 -> Properties -> Object -> 將 Project object from accidental deletion 取消勾選 -> OK
-![image](https://hackmd.io/_uploads/r1IKmWzaT.png)
-![image](https://hackmd.io/_uploads/BkxgubGTp.png)
-刪除時就不會出現錯誤了
-## 當 IIS 有使用到網路資源的設定
-不要使用掛載後的硬碟路徑，直接使用其網路路徑
-![image](https://hackmd.io/_uploads/B1Wh72pap.png)
-![image](https://hackmd.io/_uploads/r1uPE2aTT.png)
-## Edge Group Policy Templates ADMX (54 分區可能出)
-### 安裝
-打開 ```MicrosoftEdgePolicyTemplates\windows\admx```
-將這三個檔案複製到 ```C:\Windows\PolicyDefinitions```
-![image](https://hackmd.io/_uploads/B1csbpDCp.png)
-![image](https://hackmd.io/_uploads/Skawzaw0p.png)
-再回到 admx 資料夾，選擇當下系統的語系
-(若英文就是 en-US，中文就是 zh-TW，這裡的系統是 en-US)
-複製裡面全部的檔案到 ```C:\Windows\PolicyDefinitions\en-US```
-![image](https://hackmd.io/_uploads/r1Jd7TPA6.png)
-### 套用更新
-執行指令 ```gpupdate /force```，再開啟 ```gpedit.msc``` 或 Group Policy Management，在 Computer Configuration -> Administrative Templates 下即可看到四個新的與 Edge 相關的 Policy 設定
-![image](https://hackmd.io/_uploads/BkqvHaPCp.png)
-![image](https://hackmd.io/_uploads/rkxxC0DAp.png)
-註：若 Client 端未安裝 ADMX 也可以套用規則
-### 封鎖衝浪遊戲 (Surf Game)
-* Setting
-![image](https://hackmd.io/_uploads/B1V1cL_Ra.png)
-* Effect
-![image](https://hackmd.io/_uploads/Hy1cq8_CT.png)
-### 啟動、首頁和新索引標籤頁面 (Startup, home page and new tab page)
-* EN
-![image](https://hackmd.io/_uploads/Bk-TBU_AT.png)
-* ZH_TW
-![image](https://hackmd.io/_uploads/HkihDUOCa.png)
-### 允許或拒絕網頁截取螢幕畫面 (Allow or deny screen capture)
-![image](https://hackmd.io/_uploads/HymET8dRa.png)
-### 拒絕存取特定網站 (Block access to a list of URLs)
-* Setting
-![image](https://hackmd.io/_uploads/BkfMyvuAa.png)
-![image](https://hackmd.io/_uploads/SJ1VyPdAT.png)
-* Effect
-![image](https://hackmd.io/_uploads/rk8U1w_Ca.png)
 ## 對單個使用者或群組做密碼限制 (AD AC)
 打開 AD AC，到 domain (local) -> System -> Password Settings Container -> 右鍵 Password Settings
 ![image](https://hackmd.io/_uploads/BJLgKWKCp.png)
@@ -476,18 +261,6 @@ Step 2. 到想要刪除的 OU 右鍵 -> Properties -> Object -> 將 Project obje
 ## 啟用 IP Forwarding (Regedit)
 按一下 Windows Key + R，輸入 regedit 後 Enter
 設定「**Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\IPEnableRouter**」為 1
-![image](https://hackmd.io/_uploads/SJNNwq0AT.png)
-## 啟用 NTP Server (Windows Server)
-修改登錄檔，以下設定都是在目錄：「**HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time**」做設定，故只補充其後段的位置
-* 設定為 NTP Server：**「\Parameters\Type」** 更改為 “NTP”
-* 啟動 NTP Server：「**\TimeProviders\NtpServer\Enabled**」 更改為 “1”
-* 設定時間修正：「**\Config\MaxPosPhaseCorrection** 和 **\Config\MaxNegPhaseCorrection**」更改數值為 “1800” (十進位)
-用 cmd 重啟 Windows Time Service
-```bash==
-開啟 cmd.exe
-net stop w32time (停止 Service)
-net start w32time (啟用 Service)
-```
 ## 次級憑證的簽證及安裝 (Sub CA)
 先到已安裝 Main CA 的 Server，打開 Certification Authority -> 點選 Server 後右鍵 Properties 
 ![image](https://hackmd.io/_uploads/Sk4pHiuX0.png)
@@ -522,62 +295,3 @@ Issued Certidicates -> 選擇剛剛 Issue 的 CA -> Details -> Copy to File...
 ```bash==
 certutil -setreg ca\CRLFlags +CRLF_REVCHECK_IGNORE_OFFLINE
 ```
-
-## 透過 PowerShell 建立 RAID
-### 建立 Storage Pool
-打開 Server Manager -> File and Storage Services -> Storage Pools -> 右鍵 -> New Storage Pool...
-![image](https://hackmd.io/_uploads/ryntCEjXC.png)
-### 建立 RAID 磁區
-![image](https://hackmd.io/_uploads/H14eRVjXA.png)
-```bash==
-// 假設已建立好 Storage Pool "SRVDisk" (上圖)
-// 新增三個磁碟，將其設為其中一個磁碟損壞後仍可持續運作的模式，並以 40GB 左右的空間提供於 E:/
-PowerShell 指令：
-New-VirtualDisk -StoragePoolFriendlyName SRVDisk -FriendlyName SRVDisk -Size 40GB -ResiliencySettingName "Parity"
-```
-```
-ResiliencySettingName 參數解釋：
-Simple：依建立的磁碟大小，就佔多大的空間，相當於RAID 0
-Mirror：同時寫入多份，增加資料的可用性但減少空間，相當於RAID 1
-Parity：利用位元檢查將資料儲存至各個磁碟上，至少需要三顆以上的磁碟，就算有其中一顆硬碟故障也可正常運作，相當於RAID 5
-```
-找到 Disk Management
-![image](https://hackmd.io/_uploads/Bk_3kBjQ0.png)
-對剛建立的虛擬硬碟右鍵選擇 Online -> Initialize Disk
-![image](https://hackmd.io/_uploads/HkjubHj70.png)![image](https://hackmd.io/_uploads/S1vxMrsm0.png)
-選擇 GPT 分區
-![image](https://hackmd.io/_uploads/B1Wx7SjmR.png)
-選擇磁區右鍵選擇 New Simple Volume...
-![image](https://hackmd.io/_uploads/rJe8QriQR.png)
-建立完成
-![image](https://hackmd.io/_uploads/r1H2mSi70.png) ![image](https://hackmd.io/_uploads/B1lRQHiXC.png)
-## 啟用重複資料刪除機制
-安裝 Data Deduplication
-![image](https://hackmd.io/_uploads/By1ZBcbBR.png)
-File and Storage Services -> Volumes -> 選中要設定的磁區 -> Configure Data Deduplication
-![image](https://hackmd.io/_uploads/ry5xLqZr0.png)
-選擇 General purpose file server 
-![image](https://hackmd.io/_uploads/Sy92U5-HA.png)
-再按 OK 就完成了
-## AD Users CSV Import / Export
-### csvde (Import 無法使用？)
-Import
-```bash==
-csvde -i -k -f [csv_file_path]
-```
-Export
-```bash==
-csvde -r "(objectClass=user)" -m -f [csv_file_path_for_export]
-```
-![image](https://hackmd.io/_uploads/HyItOk1dC.png)
-### Powershell Import Users
-使用 `Import-CSV` 和 `ForEach-Object` 完成
-```bash==
-Import-Csv -Path [csv_path] | ForEach-Object { 
-	$user = $_
-	net group $user.group /add
-	net user $user.name $user.pass /add
-	net group $user.group $user.name /add
-}
-```
-![image](https://hackmd.io/_uploads/BJ2Tdz4_0.png)

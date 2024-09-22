@@ -2,8 +2,8 @@
 title: 'About Me!'
 image: '/hello-world/kita-ikuyo.jpg'
 alt: 'Shellkai Huang'
-created: 2024-09-14
-updated: 2024-09-14
+created: 2022-11-25
+updated: 2024-09-22
 ---
 <script lang="ts">
   
@@ -19,10 +19,15 @@ import {
 	TimelineOppositeContent
   } from 'svelte-vertical-timeline';
   const options = [
+	{ title: '臺北市國中小學生 Scratch 貓咪盃「創意遊戲」國中組 入選', time: '2020' },
 	{ title: '第 53 屆全國技能競賽分區北區賽 39 資訊與網路技術 佳作', time: '2023' },
 	{ title: '桃園國際新創機器人節 (TIRT) T1 智能賽車組 & 機器人划龍舟組', time: '2023' },
-	{ title: '第 54 屆全國技能競賽分區北區賽 39 資訊與網路技術 金牌 (第一名)', time: '2024' },
-	{ title: '第 54 屆全國技能競賽全國賽 39 資訊與網路技術 銅牌 (第三名)', time: '2024' }
+	{ title: '第 54 屆全國技能競賽分區北區賽 39 資訊與網路技術 金牌 (rk.1)', time: '2024' },
+	{ title: '第 54 屆全國技能競賽全國賽 39 資訊與網路技術 銅牌 (rk.3)', time: '2024' }
+	];
+	 const cert = [
+	{ title: 'GEPT 全民英檢 初級', time: '2020' },
+	{ title: '中華民國技術士證 電腦硬體裝修 丙級', time: '2023' }
 	];
 </script>
 
@@ -38,7 +43,9 @@ import {
 </div>
 </Profile>
 
-## Contestant memories
+安安，我是 Shellkai，目前就讀高職資訊科三年級，從一台 Android 手機開啟了我的資訊之旅，目前專攻於伺服器架設（Windows Server、Linux、Cisco Devices）、網路規劃及簡易的 Windows Server 及 Linux 的系統安全強化，希望未來能朝著資安的方向前進！
+
+## 競賽
 <Timeline position="alternate">
 	{#each options as option}
 		<TimelineItem>
@@ -55,3 +62,32 @@ import {
 		</TimelineItem>
 	{/each}
 </Timeline>
+Coming Soon...
+
+## 證照
+<Timeline position="alternate">
+	{#each cert as option}
+		<TimelineItem>
+			<TimelineOppositeContent slot="opposite-content">
+				<p>{option.time}</p>
+			</TimelineOppositeContent>
+			<TimelineSeparator>
+				<TimelineDot style={'background-color: #7CD5E2;'}/>
+				<TimelineConnector />
+			</TimelineSeparator>
+			<TimelineContent>
+				<h3>{option.title}</h3>
+			</TimelineContent>
+		</TimelineItem>
+	{/each}
+</Timeline>
+
+### 待考取 & 希望考取證照
+* 中華民國技術士證 電腦硬體裝修 乙級 (預計 2024-11 考取即測即評)
+* iPAS 資訊安全工程師 初級
+* CCNA 思科認證網路工程師
+* RHCE (Red Hat Certified Engineer)
+
+## 授課 / 其他經驗
+* 2023 松山工農黑客 IT 社 工作室網路架設課程講師 & 活動
+* 2024 松山工農資訊技術中心@選手室 設備管理員

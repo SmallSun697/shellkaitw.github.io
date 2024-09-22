@@ -1,8 +1,8 @@
 ---
 title: 'Hello World'
 image: '/hello-world/ciallo.jpg'
-created: 2021-11-01
-updated: 2021-12-12
+created: 2022-11-25
+updated: 2022-11-25
 tags:
   - 'Hello World'
 ---

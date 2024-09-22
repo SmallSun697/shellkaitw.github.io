@@ -61,7 +61,7 @@ export const header: HeaderConfig = {
     },
     {
       text: 'About',
-      link: '/hello-world/about_me'
+      link: '/about_me'
     }
   ]
 }
