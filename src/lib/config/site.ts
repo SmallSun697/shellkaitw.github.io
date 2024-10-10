@@ -11,7 +11,7 @@ export const site: SiteConfig = {
     avatar: '/assets/profile.jpg',
     name: 'Shellkai Huang',
     status: '🦾',
-    bio: '喜歡玩點伺服器，搞點刷機 & Root #Skills39',
+    bio: '喜歡玩點伺服器，搞點刷機 & Root，希望有一天能搭建屬於自己的 HomeLab #Skills39',
     // pnpm install @iconify-json/simple-icons
     metadata: [
       {
@@ -21,6 +21,10 @@ export const site: SiteConfig = {
       {
         icon: 'i-simple-icons-instagram',
         link: 'https://instagram.com/shellkai__2006'
+      },
+      {
+        icon: 'i-simple-icons-osu',
+        link: 'https://osu.ppy.sh/users/26015973'
       }
     ]
   },

@@ -20,10 +20,11 @@ import {
   } from 'svelte-vertical-timeline';
   const options = [
 	{ title: '臺北市國中小學生 Scratch 貓咪盃「創意遊戲」國中組 入選', time: '2020' },
-	{ title: '第 53 屆全國技能競賽分區北區賽 39 資訊與網路技術 佳作', time: '2023' },
+	{ title: '第 53 屆全國技能競賽分區北區賽 39 資訊與網路技術 佳作 (rk.12)', time: '2023' },
 	{ title: '桃園國際新創機器人節 (TIRT) T1 智能賽車組 & 機器人划龍舟組', time: '2023' },
+	{ title: '112 年度資安技能金盾獎', time: '2023' },
 	{ title: '第 54 屆全國技能競賽分區北區賽 39 資訊與網路技術 金牌 (rk.1)', time: '2024' },
-	{ title: '第 54 屆全國技能競賽全國賽 39 資訊與網路技術 銅牌 (rk.3)', time: '2024' }
+	{ title: '第 54 屆全國技能競賽全國賽 ⠀39 資訊與網路技術 銅牌 (rk.3)', time: '2024' }
 	];
 	 const cert = [
 	{ title: 'GEPT 全民英檢 初級', time: '2020' },
@@ -33,7 +34,7 @@ import {
 
 ## 關於我
 
-<Profile subname="ShellkaiTW" bio={`「每一次的嘗試，皆是在未知中探索著，且學習著。」`} >
+<Profile subname="ShellkaiTW" bio={`「每一次新的嘗試，皆是在未知中探索著，且學習著。」`} >
 
 <div class="flex flex-col md:flex-row gap-4 mt-4">
 <a href="https://bit.ly/shellkai" rel="noopener external" target="_blank" class="group flex-1 relative overflow-hidden btn btn-block normal-case border-none no-underline bg-[#5865f2] hover:bg-[#7983f5]">
@@ -43,7 +44,7 @@ import {
 </div>
 </Profile>
 
-安安，我是 Shellkai，目前就讀高職資訊科三年級，從一台 Android 手機開啟了我的資訊之旅，目前專攻於伺服器架設（Windows Server、Linux、Cisco Devices）、網路規劃及簡易的 Windows Server 及 Linux 的系統安全強化，希望未來能朝著資安的方向前進！
+安安，我是 Shellkai，目前就讀高職資訊科三年級，從一台 Android 手機開啟了我的資訊之旅，目前專攻於伺服器架設（Windows Server、Linux）、網管設備建置（Cisco Devices）、網路規劃及簡易的 Windows Server 及 Linux 的系統安全強化，希望未來能朝著資安的方向前進！
 
 ## 競賽
 <Timeline position="alternate">
@@ -62,7 +63,7 @@ import {
 		</TimelineItem>
 	{/each}
 </Timeline>
-Coming Soon...
+More Coming Soon...
 
 ## 證照
 <Timeline position="alternate">
