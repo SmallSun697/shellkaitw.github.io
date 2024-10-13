@@ -30,6 +30,26 @@ import {
 	{ title: 'GEPT 全民英檢 初級', time: '2020' },
 	{ title: '中華民國技術士證 電腦硬體裝修 丙級', time: '2023' }
 	];
+
+import { onMount } from 'svelte';
+
+  export let birthday = '2006-10-09'; // 默认生日，可以通过prop传入
+
+  let age = 0;
+
+  function calculateAge() {
+    const birthDate = new Date(birthday);
+    const now = new Date();
+    const diff = now - birthDate;
+    age = diff / (1000 * 60 * 60 * 24 * 365.25);
+  }
+
+  onMount(() => {
+    calculateAge();
+    const interval = setInterval(calculateAge, 50); // 每50毫秒更新一次
+
+    return () => clearInterval(interval);
+  });
 </script>
 
 ## 關於我
@@ -44,7 +64,7 @@ import {
 </div>
 </Profile>
 
-安安，我是 Shellkai，目前就讀高職資訊科三年級，從一台 Android 手機開啟了我的資訊之旅，目前專攻於伺服器架設（Windows Server、Linux）、網管設備建置（Cisco Devices）、網路規劃及簡易的 Windows Server 及 Linux 的系統安全強化，希望未來能朝著資安的方向前進！
+安安，我是 Shellkai，是個已經 {age.toFixed(10)} 歲的人類，就讀高職資訊科三年級，從一台 Android 手機開啟了我的資訊之旅，目前專攻於伺服器架設（Windows Server、Linux）、網管設備建置（Cisco Devices）、網路規劃及簡易的 Windows Server 及 Linux 的系統安全強化，希望未來能朝著資安的方向前進！
 
 ## 競賽
 <Timeline position="alternate">
