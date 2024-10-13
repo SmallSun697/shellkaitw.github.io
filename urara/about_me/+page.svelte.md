@@ -33,7 +33,7 @@ import {
 
 import { onMount } from 'svelte';
 
-  export let birthday = '2006-10-09'; // 默认生日，可以通过prop传入
+  export let birthday = '2006-10-09';
 
   let age = 0;
 
@@ -46,7 +46,7 @@ import { onMount } from 'svelte';
 
   onMount(() => {
     calculateAge();
-    const interval = setInterval(calculateAge, 50); // 每50毫秒更新一次
+    const interval = setInterval(calculateAge, 50);
 
     return () => clearInterval(interval);
   });
